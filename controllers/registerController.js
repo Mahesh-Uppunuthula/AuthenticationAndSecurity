@@ -1,7 +1,5 @@
 const User = require('../models/user');
-// const md5 = require('md5');
-const bcrypt = require('bcrypt');
-const saltingRounds = 10;
+const passport = require('passport');
 
 exports.renderRegisterPage = async (req, res) => {
     res.render('register');
@@ -10,23 +8,22 @@ exports.renderRegisterPage = async (req, res) => {
 exports.registerUser = async (req, res) => {
     const username = req.body.username;
     const password = req.body.password;
-    // const password = md5(req.body.password);
 
-    bcrypt.hash(password, saltingRounds, (err, hash) => {
-
-        const newUser = new User(
-            {
-                username: username,
-                password: hash
+    User.register({username:username}, password, (err, user) =>{
+        if(err)
+        {
+            console.log(err);
+            res.redirect('/register');
+        }
+        else
+        {
+            console.log(user);
+            passport.authenticate("local")(req, res, ()=>{
+                console.log("register authentication");
+                res.redirect('/secrets');
             })
-
-        newUser.save()
-            .then(() => {
-                res.render('secrets');
-            })
-            .catch((err) => {
-                res.send(err);
-            })
+        };
     })
+
 
 }
