@@ -1,10 +1,12 @@
-const passport = require('passport');
-const passportLocalMongoose = require('passport-local-mongoose');
+const User = require("../models/user");
 
 exports.renderSecretsPage = async(req, res) =>{
-    if(req.isAuthenticated()){
-        console.log("user authenticated");
-        res.render('secrets')
-    }
-    else res.redirect('/login');
+    User.find()
+    .then((foundUsers) =>{
+        console.log(foundUsers);
+        res.render("secrets", {usersWithSecrets: foundUsers});
+    })
+    .catch((err) =>{
+        console.log(err);
+    })
 }
